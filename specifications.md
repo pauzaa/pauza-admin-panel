@@ -543,40 +543,32 @@ export const router = createBrowserRouter([
 ```
 
 **Sidebar (`src/components/layout/Sidebar.tsx`):**
-- Fixed width: `w-60` (240px)
-- Full viewport height: `h-screen`
-- Background: `bg-surface-container-low`
-- Border right: `border-r border-outline-variant`
-- Top section: Pauza wordmark text in primary color, `text-xl font-bold`, with "Admin" subtitle in `text-on-surface-variant text-sm`
-- Navigation section: vertical list of `NavLink` items
-- Each nav item: `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium`
-  - Default: `text-on-surface-variant hover:bg-surface-container`
-  - Active: `bg-primary/10 text-primary`
+- Fixed width: 240px, full viewport height
+- Background: `surface-container-low` token, right border with `outline-variant`
+- Top section: `PauzaLogo` component
+- Navigation section: vertical list of `NavLink` items with icons
+  - Active state: visually distinct but subtle (not a heavy solid fill)
+  - Inactive state: muted text, highlighted on hover
 - Nav items (in order):
   1. `LayoutDashboard` icon + "Dashboard" → `/` (uses `end` prop — exact match only)
   2. `Users` icon + "Users" → `/users` (no `end` — stays active on `/users/:id`)
   3. `Shield` icon + "Entitlements" → `/entitlements`
   4. `DollarSign` icon + "Revenue" → `/revenue`
-- Bottom section: `LogOut` icon + "Logout" button, same styling as nav items but with `text-error` on hover
-- Separator between nav and logout: `border-t border-outline-variant`
+- Bottom section: `LogOut` icon + "Logout" button, error-tinted on hover
+- Separator between nav and logout
 
 **TopBar (`src/components/layout/TopBar.tsx`):**
-- Height: `h-14` (56px)
-- Background: `bg-surface`
-- Border bottom: `border-b border-outline-variant`
-- Left: Page title in `text-lg font-semibold text-on-surface`
-  - Title derived from current route path:
-    - `/` → "Dashboard"
-    - `/users` → "Users"
-    - `/users/:id` → "User Details"
-    - `/entitlements` → "Entitlements"
-    - `/revenue` → "Revenue"
-- Right: `flex items-center gap-3`
-  - Dark mode toggle: `Sun` / `Moon` icon button (24px), `text-on-surface-variant hover:text-on-surface`
-  - Admin avatar: `w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary text-sm font-bold` showing "A"
+- Height: 56px, sticky, surface background with bottom border
+- Left: Page title derived from current route path:
+  - `/` → "Dashboard"
+  - `/users` → "Users"
+  - `/users/:id` → "User Details"
+  - `/entitlements` → "Entitlements"
+  - `/revenue` → "Revenue"
+- Right: Dark mode toggle (`Sun`/`Moon` icon button) + admin avatar circle showing "A"
 
 **Content area:**
-- `flex-1 overflow-y-auto p-6 bg-surface-container-lowest`
+- Fills remaining space, vertically scrollable, padded, uses `surface-container-lowest` background
 
 ---
 
@@ -613,15 +605,13 @@ Full-screen centered layout. No sidebar or top bar.
 ```
 
 **Styling:**
-- Page background: `bg-surface-container`
-- Card: `bg-surface rounded-xl p-8 shadow-sm border border-outline-variant max-w-[400px] w-full`
-- "Pauza" text: `text-3xl font-bold text-primary`
-- "Admin Panel" text: `text-sm text-on-surface-variant mb-8`
-- Input labels: `text-sm font-medium text-on-surface mb-1.5`
-- Inputs: shadcn `Input` component with Pauza theme overrides
-- Sign In button: `w-full bg-primary text-on-primary font-semibold py-2.5 rounded-lg hover:bg-primary/90`
-- Error text: `text-sm text-error mt-4`
-- Dark mode toggle: absolute positioned top-right of the page, same icon button as TopBar
+- Page background: `surface-container` token
+- Centered card (~400px max-width) with surface background, rounded corners, subtle border and shadow
+- `PauzaLogo` component (md size) at top of card
+- Inputs: shadcn `Input` component
+- Sign In button: full-width, primary color
+- Error text: error color, below the button
+- Dark mode toggle: absolute positioned top-right of the page
 
 **Behavior:**
 - On submit: call `POST /api/v1/admin/login` with `{ username, password }`
@@ -676,12 +666,10 @@ Full-screen centered layout. No sidebar or top bar.
 ```
 
 **Grid layout:**
-- Stats cards row 1: `grid grid-cols-4 gap-4`
-- Stats cards row 2: `grid grid-cols-4 gap-4` (two cards, spanning col 1-2)
-- Revenue cards: `grid grid-cols-4 gap-4`
-- Charts row: `grid grid-cols-2 gap-4`
-- Revenue chart: `col-span-2` (full width)
-- Vertical gap between sections: `space-y-6`
+- Stats cards: 4-column grid
+- Revenue overview cards: 4-column grid
+- Charts: 2-column grid, revenue chart spans full width
+- Vertical spacing between sections
 
 **Data sources & TanStack Query:**
 - Platform stats: `useQuery({ queryKey: ['stats'], queryFn: getPlatformStats, staleTime: 60_000 })`
@@ -708,7 +696,7 @@ Full-screen centered layout. No sidebar or top bar.
 - Duration (avg daily focus): `formatDuration()` (e.g., "1h 23m") — value from API is in ms
 - Streak: `${value.toFixed(1)} days`
 
-**Loading state:** Each stats card shows a `h-8 w-24 bg-surface-container-high rounded animate-pulse` skeleton for the value while loading.
+**Loading state:** Each stats card shows a skeleton placeholder for the value while loading.
 
 **Error state:** If stats query fails, show `ErrorAlert` component in place of the cards row with "Failed to load statistics" message and a "Retry" button.
 
@@ -752,7 +740,7 @@ Full-screen centered layout. No sidebar or top bar.
 | Joined   | `created_at`                 | 120px   | `formatDate()` → "Jan 1, 2025"                                        |
 | (action) | —                            | 40px    | `ChevronRight` icon, entire row is clickable → `/users/:id`           |
 
-**Avatar rendering:** If `profile_picture_url` is set, render `<img>` with `onError` fallback to initials avatar (handles broken URLs gracefully). **Initials fallback:** Split `name` by whitespace; take first character of first segment + first character of last segment (e.g., "Alice Johnson" → "AJ", "Alice" → "A"). If name is empty, use first letter of `email`. Background: `bg-primary/10`, text: `text-primary text-xs font-semibold`.
+**Avatar rendering:** If `profile_picture_url` is set, render `<img>` with `onError` fallback to initials avatar (handles broken URLs gracefully). **Initials fallback:** Split `name` by whitespace; take first character of first segment + first character of last segment (e.g., "Alice Johnson" → "AJ", "Alice" → "A"). If name is empty, use first letter of `email`. Use subtle primary-tinted background with primary text.
 
 **Pagination:**
 - Below table: "Showing {start}-{end} of {total}" on the left
@@ -821,42 +809,36 @@ useQuery({
 **Back button:** `ArrowLeft` icon + "Back to Users" text, navigates to `/users`.
 
 **Profile card (left):**
-- Card: `bg-surface-container rounded-xl p-6`
-- Avatar: 64px circle, same initials fallback as list page
-- Name: `text-xl font-semibold text-on-surface`
-- Username: `text-sm text-on-surface-variant`
-- Status: `StatusBadge` driven by `is_premium` field from `UserDetail`
-- Expires: `text-sm text-on-surface-variant` — shows `formatDate(current_period_end)` or "No expiry" if null
-- Avatar: 64px circle. If `profile_picture_url` is set, render `<img>` with `onError` fallback to initials
+- Card with `surface-container` background
+- Avatar: 64px circle, same initials fallback as list page (image with `onError` fallback)
+- Name, username, `StatusBadge` driven by `is_premium`, expiry date (`formatDate(current_period_end)` or "No expiry" if null)
 
 **Info card (right):**
-- Card: `bg-surface-container rounded-xl p-6`
-- Key-value pairs in a `dl` grid: `grid grid-cols-[auto_1fr] gap-x-6 gap-y-3`
-- Keys: `text-sm font-medium text-on-surface-variant`
-- Values: `text-sm text-on-surface`
+- Card with `surface-container` background
+- Key-value pairs in a grid layout (Email, Joined, Leaderboard, Friends, Sessions, Last Session)
 - Leaderboard: "Visible" (green) or "Hidden" (gray)
 - Last session: `formatRelativeTime(last_session_time)` — if null, show "Never"
   - Note: `last_session_time` is epoch ms, convert to ISO string first
 
-**Layout:** `grid grid-cols-[280px_1fr] gap-6` for the profile + info row.
+**Layout:** Two-column grid (profile ~280px, info fills remaining) for the profile + info row.
 
 **Entitlement management card:**
-- Card: `bg-surface-container rounded-xl p-6`
+- Card with `surface-container` background
 - Current status line: "Current: Active (expires Mar 30, 2026)" or "Current: Inactive"
 - `expires_at` input: HTML `<input type="datetime-local">` styled with shadcn. Optional field.
 - Two action buttons side by side:
-  - "Grant Premium": `bg-success text-on-success font-semibold px-6 py-2.5 rounded-lg`
-  - "Revoke Premium": `bg-error text-on-error font-semibold px-6 py-2.5 rounded-lg`
+  - "Grant Premium": success-colored button
+  - "Revoke Premium": error-colored button
 
 **Confirmation dialog flow (uses shadcn `Dialog`):**
 - Clicking "Grant Premium" opens a dialog:
   - Title: "Grant Premium"
   - Body: "Are you sure you want to grant premium access to **{name}**?" If `expires_at` is set, also show "Expires: {formatted date}".
-  - Buttons: "Cancel" (outline) / "Confirm Grant" (`bg-success text-on-success`)
+  - Buttons: "Cancel" (outline) / "Confirm Grant" (success-colored)
 - Clicking "Revoke Premium" opens a dialog:
   - Title: "Revoke Premium"
   - Body: "Are you sure you want to revoke premium access from **{name}**? This action takes effect immediately."
-  - Buttons: "Cancel" (outline) / "Confirm Revoke" (`bg-error text-on-error`)
+  - Buttons: "Cancel" (outline) / "Confirm Revoke" (error-colored)
 - The API mutation fires only after clicking the confirm button
 - Dialog closes on cancel or after successful mutation
 - Confirm button shows loading spinner during mutation; disabled while in flight
@@ -932,10 +914,7 @@ useMutation({
 
 **Filter control:**
 - Segmented button group (3 options): "All", "Active", "Inactive"
-- Styling: `inline-flex rounded-lg border border-outline-variant overflow-hidden`
-  - Each segment: `px-4 py-2 text-sm font-medium`
-  - Default: `bg-surface text-on-surface-variant`
-  - Active: `bg-primary text-on-primary`
+- Active segment visually distinct from inactive segments
 - "All" selected by default (no `is_active` param sent)
 - "Active" sends `is_active=true`, "Inactive" sends `is_active=false`
 - Changing filter resets page to 1
@@ -1031,11 +1010,11 @@ interface StatsCardProps {
 +---------------------------+
 ```
 
-- Container: `bg-surface-container rounded-xl p-5 border border-outline-variant/50`
-- Icon: `w-5 h-5 text-on-surface-variant mb-2`
-- Label: `text-sm text-on-surface-variant mb-1`
-- Value: `text-2xl font-bold text-on-surface`
-- Loading skeleton: `h-8 w-24 bg-surface-container-high rounded animate-pulse`
+- Card container with `surface-container` background, rounded, subtle border
+- Icon: muted color, small size
+- Label: small muted text
+- Value: large bold text
+- Loading: skeleton placeholder for value
 
 **Format logic:**
 - `'number'` (default): `formatNumber(value)` → "1,234"
@@ -1072,10 +1051,9 @@ interface DataTableProps<T> {
 **Structure:**
 - Top bar: search input (left) + CSV export button (right) — only if respective props provided
 - shadcn `Table` with `TableHeader`, `TableBody`, `TableRow`, `TableHead`, `TableCell`
-- Table header: `bg-surface-container-high text-on-surface-variant text-xs font-semibold uppercase tracking-wider`
-- Table rows: `border-b border-outline-variant/50 hover:bg-surface-container transition-colors cursor-pointer` (if `onRowClick`)
-- Table cells: `text-sm text-on-surface py-3 px-4`
-- Loading overlay: semi-transparent `bg-surface/60` with centered `LoadingSpinner`
+- Table header: muted background, uppercase small text
+- Table rows: subtle border, hover highlight, pointer cursor (if `onRowClick`)
+- Loading overlay: semi-transparent surface with centered `LoadingSpinner`
 - Empty state: `EmptyState` component spanning full table width
 - Bottom: `PaginationControls`
 
@@ -1096,30 +1074,27 @@ interface TimeSeriesChartProps {
 ```
 
 **Render:**
-- Card container: `bg-surface-container rounded-xl p-5 border border-outline-variant/50`
-- Title: `text-base font-semibold text-on-surface mb-1`
-- Range selector below title: 4 buttons (`30d`, `90d`, `1y`, `All`)
-  - Same segmented style as entitlements filter
-- Chart area: Recharts `ResponsiveContainer` height 280px
-  - `AreaChart` with single `Area`
-  - `XAxis`: `dataKey="date"`, `tick={{ fill: 'var(--color-on-surface-variant)', fontSize: 12 }}`
-    - Date formatting: For 30d show "Jan 1", for 90d show "Jan 1", for 1y show "Jan", for All show "2024"
-    - Tick formatter implementation:
-      ```ts
-      // XAxis tick formatter — used as tickFormatter prop
-      function formatXAxisDate(dateStr: string, range: TimeRange): string {
-        const d = new Date(dateStr);
-        if (range === 'all') return d.getFullYear().toString();
-        if (range === '1y') return d.toLocaleDateString('en-US', { month: 'short' });
-        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-      }
-      ```
-  - `YAxis`: same tick style, formatter from prop
-  - `CartesianGrid`: `stroke="var(--color-outline-variant)"`, `strokeDasharray="3 3"`
-  - `Area`: `type="monotone"`, `fill="color-mix(in srgb, var(--color-primary) 10%, transparent)"`, `stroke="var(--color-primary)"`, `strokeWidth={2}`
-  - `Tooltip`: custom component with `bg-surface-container-high rounded-lg p-3 border border-outline-variant shadow-md`
-    - Date in `text-xs text-on-surface-variant`
-    - Value in `text-sm font-semibold text-on-surface`
+- Card container with `surface-container` background, rounded, subtle border
+- Title and range selector (4 buttons: `30d`, `90d`, `1y`, `All`) at top
+- Chart area: Recharts `ResponsiveContainer` height ~280px
+  - `AreaChart` with single `Area`, monotone interpolation
+  - X-axis date formatting varies by range:
+    - 30d/90d: "Jan 1" (month + day)
+    - 1y: "Jan" (month only)
+    - All: "2024" (year only)
+  - Tick formatter implementation:
+    ```ts
+    function formatXAxisDate(dateStr: string, range: TimeRange): string {
+      const d = new Date(dateStr);
+      if (range === 'all') return d.getFullYear().toString();
+      if (range === '1y') return d.toLocaleDateString('en-US', { month: 'short' });
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+    ```
+  - Y-axis formatter from prop
+  - Dashed grid lines using `outline-variant` color
+  - Area fill: subtle primary tint, stroke: primary color
+  - Custom tooltip showing date and formatted value
 - Loading: skeleton rectangle matching chart dimensions
 
 ### 7.4 StatusBadge
@@ -1132,8 +1107,8 @@ interface StatusBadgeProps {
 ```
 
 **Render:**
-- Active: `inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-success/10 text-success` — text "Active"
-- Inactive: `inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-on-surface-variant/10 text-on-surface-variant` — text "Inactive"
+- Active: pill badge with success-tinted background + success text, label "Active"
+- Inactive: pill badge with muted background + muted text, label "Inactive"
 
 ### 7.5 shadcn/ui Components to Install
 
@@ -1173,31 +1148,24 @@ This avoids editing individual shadcn component files while ensuring they use th
 
 **Props:** `{ size?: 'sm' | 'md' | 'lg' }` — defaults to `'md'`
 
-**Render:** An animated spinner using `Loader2` icon from lucide-react with `animate-spin` class.
-- `sm`: `w-4 h-4`
-- `md`: `w-6 h-6`
-- `lg`: `w-8 h-8`
-- Color: `text-primary`
+**Render:** An animated spinner using `Loader2` icon from lucide-react with spin animation. Three sizes: `sm` (16px), `md` (24px), `lg` (32px). Primary color.
 
 ### 7.7 ErrorAlert
 
 **Props:** `{ message: string; onRetry?: () => void }`
 
 **Render:**
-- Container: `bg-error-container rounded-lg p-4 flex items-center gap-3`
-- `AlertTriangle` icon: `w-5 h-5 text-on-error-container`
-- Message: `text-sm text-on-error-container flex-1`
-- Retry button (if `onRetry`): `text-sm font-medium text-on-error-container underline hover:no-underline`
+- Container with `error-container` background, rounded, horizontal layout
+- `AlertTriangle` icon + message text + optional "Retry" link button
+- All text uses `on-error-container` color
 
 ### 7.8 EmptyState
 
 **Props:** `{ icon: LucideIcon; title: string; description?: string }`
 
 **Render:**
-- Centered container: `flex flex-col items-center justify-center py-12`
-- Icon: `w-12 h-12 text-on-surface-variant/40 mb-4`
-- Title: `text-base font-medium text-on-surface-variant mb-1`
-- Description: `text-sm text-on-surface-variant/70`
+- Vertically centered container with generous padding
+- Large muted icon + title + optional description, all center-aligned
 
 ### 7.9 PaginationControls
 
@@ -1216,10 +1184,8 @@ interface PaginationControlsProps {
 Showing 1-20 of 150                    [< Prev]  Page 1 of 8  [Next >]
 ```
 
-- Left text: `text-sm text-on-surface-variant`
-- Buttons: shadcn `Button` variant `outline`, size `sm`
-- `ChevronLeft` / `ChevronRight` icons on buttons
-- Page indicator: `text-sm text-on-surface`
+- Left: "Showing X-Y of Z" muted text
+- Right: Previous/Next buttons (shadcn `Button` outline, small) with `ChevronLeft`/`ChevronRight` icons + page indicator
 - Previous disabled when `page === 1`, Next disabled when `page * limit >= total`
 
 ---
