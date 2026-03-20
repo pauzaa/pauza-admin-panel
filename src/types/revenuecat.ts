@@ -21,9 +21,9 @@ export interface RCSubscriberEntitlement {
   entitlement_id: string;
   is_active: boolean;
   product_identifier: string;
-  purchase_date: string; // RFC 3339
-  expires_date: string | null; // RFC 3339
-  grace_period_expires_date: string | null; // RFC 3339
+  purchase_date: number; // Unix ms
+  expires_date: number | null; // Unix ms
+  grace_period_expires_date: number | null; // Unix ms
 }
 
 export interface RCSubscriberDetail {

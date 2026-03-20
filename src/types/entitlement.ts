@@ -6,8 +6,8 @@ export interface EntitlementListItem {
   username: string;
   entitlement: string;
   is_active: boolean;
-  current_period_end: string | null; // RFC 3339
-  updated_at: string; // RFC 3339
+  current_period_end: number | null; // Unix ms
+  updated_at: number; // Unix ms
 }
 
 export interface ListEntitlementsResponse {
@@ -18,7 +18,7 @@ export interface ListEntitlementsResponse {
 export interface ManageEntitlementRequest {
   action: 'grant' | 'revoke';
   entitlement: 'premium';
-  expires_at?: string; // RFC 3339, must be in the future
+  expires_at?: number; // Unix ms, must be in the future
 }
 
 export interface ManageEntitlementResponse {

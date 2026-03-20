@@ -7,7 +7,7 @@ export interface UserListItem {
   username: string;
   profile_picture_url: string | null;
   premium_entitlement_active: boolean;
-  created_at: string; // RFC 3339
+  created_at: number; // Unix ms
 }
 
 export interface ListUsersResponse {
@@ -22,9 +22,9 @@ export interface UserDetail {
   username: string;
   profile_picture_url: string | null;
   leaderboard_visible: boolean;
-  created_at: string; // RFC 3339
+  created_at: number; // Unix ms
   is_premium: boolean;
-  current_period_end: string | null; // RFC 3339
+  current_period_end: number | null; // Unix ms
   revenuecat_app_user_id: string | null;
   friend_count: number;
   total_sessions: number;
