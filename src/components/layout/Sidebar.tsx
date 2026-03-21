@@ -32,7 +32,7 @@ export function Sidebar() {
           <NavLink
             key={to}
             to={to}
-            end={end}
+            end={end as boolean | undefined}
             className={({ isActive }) =>
               cn(
                 'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',

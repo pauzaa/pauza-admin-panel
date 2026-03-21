@@ -12,3 +12,10 @@ export const TIME_RANGE_LABELS: Record<TimeRange, string> = {
   '1y': '1 Year',
   all: 'All Time',
 };
+
+export const TIME_RANGE_SHORT_LABELS: Record<TimeRange, string> = {
+  '30d': '30d',
+  '90d': '90d',
+  '1y': '1y',
+  all: 'All',
+};

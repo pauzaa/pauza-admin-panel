@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { FormEvent } from 'react';
+import type { SyntheticEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 
@@ -36,19 +36,21 @@ export function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  function handleSubmit(e: SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
     setIsLoading(true);
 
-    try {
-      await login(username, password);
-      navigate('/', { replace: true });
-    } catch (err: unknown) {
-      setError(getErrorMessage(err));
-    } finally {
-      setIsLoading(false);
-    }
+    void login(username, password)
+      .then(() => {
+        void navigate('/', { replace: true });
+      })
+      .catch((err: unknown) => {
+        setError(getErrorMessage(err));
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }
 
   return (
@@ -85,7 +87,7 @@ export function LoginPage() {
                 autoFocus
                 autoComplete="username"
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={(e) => { setUsername(e.target.value); }}
                 disabled={isLoading}
                 required
               />
@@ -103,7 +105,7 @@ export function LoginPage() {
                 type="password"
                 autoComplete="current-password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => { setPassword(e.target.value); }}
                 disabled={isLoading}
                 required
               />

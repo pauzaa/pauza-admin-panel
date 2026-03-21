@@ -35,5 +35,5 @@ export function downloadCSV(
   link.href = url;
   link.download = `${filename}_${date}.csv`;
   link.click();
-  setTimeout(() => URL.revokeObjectURL(url), 100);
+  setTimeout(() => { URL.revokeObjectURL(url); }, 100);
 }

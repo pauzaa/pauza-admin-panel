@@ -33,7 +33,7 @@ export async function apiFetch<T>(
       ...options,
       headers: {
         ...headers,
-        ...options?.headers,
+        ...(options?.headers as Record<string, string> | undefined),
       },
     });
   } catch {
