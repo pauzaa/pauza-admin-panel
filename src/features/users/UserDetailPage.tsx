@@ -66,7 +66,7 @@ export function UserDetailPage() {
         Back to Users
       </Button>
 
-      <div className="grid grid-cols-[280px_1fr] gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-[280px_1fr]">
         <UserProfileCard user={user} />
         <UserInfoCard user={user} />
       </div>

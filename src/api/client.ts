@@ -60,9 +60,9 @@ export async function apiFetch<T>(
     }
 
     throw new ApiError(
-      body?.error?.code ?? 'UNKNOWN_ERROR',
-      body?.error?.message ?? response.statusText,
-      body?.error?.details?.fields,
+      body?.error.code ?? 'UNKNOWN_ERROR',
+      body?.error.message ?? response.statusText,
+      body?.error.details?.fields,
     );
   }
 

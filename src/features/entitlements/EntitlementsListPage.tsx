@@ -146,8 +146,8 @@ export function EntitlementsListPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-lg font-semibold text-on-surface">Entitlements</h1>
+    <div className="space-y-4 sm:space-y-6">
+      <h1 className="text-base font-semibold text-on-surface sm:text-lg">Entitlements</h1>
 
       <div className="inline-flex rounded-lg border border-outline-variant">
         {FILTER_OPTIONS.map((option) => (
@@ -156,7 +156,7 @@ export function EntitlementsListPage() {
             type="button"
             onClick={() => { handleFilterChange(option.value); }}
             className={cn(
-              'px-4 py-1.5 text-sm transition-colors first:rounded-l-lg last:rounded-r-lg',
+              'px-3 py-1.5 text-sm transition-colors first:rounded-l-lg last:rounded-r-lg sm:px-4',
               filter === option.value
                 ? 'bg-primary/10 font-medium text-primary'
                 : 'text-on-surface-variant hover:bg-surface-container',

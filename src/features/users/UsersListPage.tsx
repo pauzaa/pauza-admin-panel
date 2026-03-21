@@ -115,8 +115,8 @@ export function UsersListPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-lg font-semibold text-on-surface">Users</h1>
+    <div className="space-y-4 lg:space-y-6">
+      <h1 className="text-base font-semibold text-on-surface lg:text-lg">Users</h1>
 
       {usersQuery.error && (
         <ErrorAlert

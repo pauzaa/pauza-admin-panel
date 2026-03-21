@@ -41,15 +41,15 @@ export function StatsCard({
 }: StatsCardProps) {
   return (
     <Card className="bg-surface-container">
-      <CardContent className="flex flex-col gap-2 p-4">
-        <div className="flex items-center gap-2">
-          <Icon className="size-5 text-on-surface-variant" />
-          <span className="text-sm text-on-surface-variant">{label}</span>
+      <CardContent className="flex flex-col gap-1.5 p-3 lg:gap-2 lg:p-4">
+        <div className="flex items-center gap-1.5 lg:gap-2">
+          <Icon className="size-4 text-on-surface-variant lg:size-5" />
+          <span className="text-xs text-on-surface-variant lg:text-sm">{label}</span>
         </div>
         {isLoading ? (
-          <Skeleton className="h-8 w-24" />
+          <Skeleton className="h-7 w-20 lg:h-8 lg:w-24" />
         ) : (
-          <span className="text-2xl font-bold text-on-surface">
+          <span className="text-xl font-bold text-on-surface lg:text-2xl">
             {formatValue(value, formatAs, suffix)}
           </span>
         )}

@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Area,
   AreaChart,
@@ -19,6 +20,49 @@ import type { TimeRange } from '@/lib/constants';
 import { formatChartDate } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
+function hasDateString(value: unknown): value is { date: string } {
+  if (typeof value !== 'object' || value === null || !('date' in value)) return false;
+  const { date } = value;
+  return typeof date === 'string';
+}
+
+function useContainerWidth() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(0);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    setWidth(el.getBoundingClientRect().width);
+
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (entry) {
+        const newWidth = Math.round(entry.contentRect.width);
+        setWidth((prev) => (prev === newWidth ? prev : newWidth));
+      }
+    });
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  return { ref, width };
+}
+
+/** Derives responsive chart dimensions from container width. */
+function getChartDimensions(containerWidth: number) {
+  const isCompact = containerWidth > 0 && containerWidth < 500;
+
+  return {
+    chartHeight: isCompact ? 200 : 280,
+    yAxisWidth: isCompact ? 36 : 50,
+    tickFontSize: isCompact ? 10 : 12,
+  } as const;
+}
+
 interface TimeSeriesChartProps {
   data: ReadonlyArray<{ date: string; value: number }>;
   range: TimeRange;
@@ -38,6 +82,15 @@ function getCSSColor(varName: string, fallback: string): string {
   );
 }
 
+function useChartColors(theme: string, color?: string) {
+  return useMemo(() => ({
+    chartColor: color ?? getCSSColor('--color-primary', '#800020'),
+    axisColor: getCSSColor('--color-on-surface-variant', '#6d6470'),
+    gridColor: getCSSColor('--color-outline-variant', '#d9d3d8'),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- theme triggers re-read of CSS custom properties
+  }), [theme, color]);
+}
+
 interface ChartTooltipContentProps {
   rechartProps: TooltipProps<number, string>;
   range: TimeRange;
@@ -54,8 +107,8 @@ function ChartTooltipContent({
   if (!active || !payload?.[0]) return null;
 
   const point = payload[0];
-  const pointData = point.payload as Record<string, unknown>;
-  const dateStr = typeof pointData['date'] === 'string' ? pointData['date'] : undefined;
+  const pointData: unknown = point.payload;
+  const dateStr = hasDateString(pointData) ? pointData.date : undefined;
   const value = point.value;
 
   if (!dateStr || value === undefined) return null;
@@ -82,16 +135,22 @@ export function TimeSeriesChart({
   color,
 }: TimeSeriesChartProps) {
   const { theme } = useTheme();
-  const chartColor = color ?? getCSSColor('--color-primary', '#800020');
-  const axisColor = getCSSColor('--color-on-surface-variant', '#6d6470');
-  const gridColor = getCSSColor('--color-outline-variant', '#d9d3d8');
+  const { ref: containerRef, width: containerWidth } = useContainerWidth();
+  const { chartHeight, yAxisWidth, tickFontSize } = getChartDimensions(containerWidth);
+
+  const { chartColor, axisColor, gridColor } = useChartColors(theme, color);
+
   const gradientId = `area-gradient-${title.replace(/\s+/g, '-')}`;
+  const mutableData = useMemo(() => [...data], [data]);
+  const heightClass = chartHeight === 200 ? 'h-[200px]' : 'h-[280px]';
+  const tickStyle = useMemo(() => ({ fontSize: tickFontSize, fill: axisColor }), [tickFontSize, axisColor]);
+  const cursorStyle = useMemo(() => ({ stroke: gridColor, strokeDasharray: '3 3' }), [gridColor]);
 
   return (
-    <Card className="border border-outline-variant bg-surface-container">
-      <div className="flex items-center justify-between px-6 pb-2 pt-5">
-        <h3 className="text-base font-semibold text-on-surface">{title}</h3>
-        <div className="flex items-center gap-1">
+    <Card ref={containerRef} className="border border-outline-variant bg-surface-container">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-4 pb-2 pt-4 sm:px-6 sm:pt-5">
+        <h3 className="text-sm font-semibold text-on-surface sm:text-base">{title}</h3>
+        <div className="flex flex-wrap items-center gap-1">
           {TIME_RANGES.map((r) => (
             <Button
               key={r}
@@ -109,16 +168,16 @@ export function TimeSeriesChart({
         </div>
       </div>
 
-      <div className="px-2 pb-4">
+      <div className="px-1 pb-3 sm:px-2 sm:pb-4">
         {isLoading ? (
-          <Skeleton className="mx-4 h-[280px] rounded-lg" />
+          <Skeleton className={cn('mx-4 rounded-lg', heightClass)} />
         ) : data.length === 0 ? (
-          <div className="flex h-[280px] items-center justify-center">
+          <div className={cn('flex items-center justify-center', heightClass)}>
             <p className="text-sm text-on-surface-variant">No data available</p>
           </div>
         ) : (
-          <ResponsiveContainer key={theme} width="100%" height={280}>
-            <AreaChart data={[...data]}>
+          <ResponsiveContainer key={theme} width="100%" height={chartHeight}>
+            <AreaChart data={mutableData}>
               <defs>
                 <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor={chartColor} stopOpacity={0.2} />
@@ -135,15 +194,15 @@ export function TimeSeriesChart({
                 tickFormatter={(dateStr: string) => formatChartDate(dateStr, range)}
                 axisLine={false}
                 tickLine={false}
-                tick={{ fontSize: 12, fill: axisColor }}
+                tick={tickStyle}
                 dy={8}
               />
               <YAxis
                 tickFormatter={yAxisFormatter}
                 axisLine={false}
                 tickLine={false}
-                tick={{ fontSize: 12, fill: axisColor }}
-                width={50}
+                tick={tickStyle}
+                width={yAxisWidth}
               />
               <Tooltip
                 content={(props) => (
@@ -153,7 +212,7 @@ export function TimeSeriesChart({
                     tooltipFormatter={tooltipFormatter}
                   />
                 )}
-                cursor={{ stroke: gridColor, strokeDasharray: '3 3' }}
+                cursor={cursorStyle}
               />
               <Area
                 type="monotone"

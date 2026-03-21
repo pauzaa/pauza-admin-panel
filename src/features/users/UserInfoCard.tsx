@@ -37,7 +37,7 @@ export function UserInfoCard({ user }: UserInfoCardProps) {
         <CardTitle>User Information</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 gap-x-6 gap-y-4 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
           {fields.map((field) => (
             <div key={field.label} className="space-y-1">
               <dt className="text-xs font-medium uppercase tracking-wider text-on-surface-variant">

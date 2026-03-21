@@ -58,17 +58,17 @@ export function DataTable<T>({
     <div>
       {showToolbar && (
         <div className={cn(
-          'flex items-center gap-4 pb-4',
-          onSearchChange && onExportCSV ? 'justify-between' : 'justify-end',
+          'flex flex-col gap-3 pb-4 sm:flex-row sm:items-center sm:gap-4',
+          onSearchChange && onExportCSV ? 'sm:justify-between' : 'sm:justify-end',
         )}>
           {onSearchChange && (
-            <div className="relative">
+            <div className="relative w-full sm:w-64">
               <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-on-surface-variant" />
               <Input
                 value={searchValue ?? ''}
                 onChange={(e) => { onSearchChange(e.target.value); }}
                 placeholder={searchPlaceholder}
-                className="w-64 pl-9"
+                className="w-full pl-9"
               />
             </div>
           )}
@@ -91,7 +91,7 @@ export function DataTable<T>({
         </div>
       )}
 
-      <div className="relative overflow-hidden rounded-lg border border-outline-variant">
+      <div className="relative overflow-x-auto rounded-lg border border-outline-variant">
         {isLoading && (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-surface/60">
             <LoadingSpinner size="lg" />

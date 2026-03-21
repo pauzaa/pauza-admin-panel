@@ -1,6 +1,7 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface PaginationControlsProps {
   page: number;
@@ -22,8 +23,18 @@ export function PaginationControls({
   const isLastPage = page * limit >= total;
 
   return (
-    <div className="flex items-center justify-between pt-4">
-      <span className="text-sm text-on-surface-variant">
+    <div
+      className={cn(
+        'flex flex-col items-center gap-2 pt-4',
+        'sm:flex-row sm:justify-between sm:gap-0',
+      )}
+    >
+      <span
+        className={cn(
+          'text-sm text-on-surface-variant',
+          total > 0 && 'hidden sm:inline',
+        )}
+      >
         {total === 0
           ? 'No results'
           : `Showing ${String(rangeStart)}–${String(rangeEnd)} of ${String(total)}`}

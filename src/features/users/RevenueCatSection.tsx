@@ -61,8 +61,8 @@ export function RevenueCatSection({ userId }: RevenueCatSectionProps) {
                 No entitlements found for this subscriber.
               </p>
             ) : (
-            <div className="overflow-hidden rounded-lg border border-outline-variant">
-              <Table>
+            <div className="overflow-x-auto rounded-lg border border-outline-variant">
+              <Table className="min-w-[640px]">
                 <TableHeader>
                   <TableRow className="bg-surface-container hover:bg-surface-container">
                     <TableHead className={TH_CLASS}>
