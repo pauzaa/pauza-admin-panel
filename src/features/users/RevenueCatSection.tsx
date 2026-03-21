@@ -56,6 +56,11 @@ export function RevenueCatSection({ userId }: RevenueCatSectionProps) {
               </span>
             </p>
 
+            {rcQuery.data.entitlements.length === 0 ? (
+              <p className="py-4 text-center text-sm text-on-surface-variant">
+                No entitlements found for this subscriber.
+              </p>
+            ) : (
             <div className="overflow-hidden rounded-lg border border-outline-variant">
               <Table>
                 <TableHeader>
@@ -108,6 +113,7 @@ export function RevenueCatSection({ userId }: RevenueCatSectionProps) {
                 </TableBody>
               </Table>
             </div>
+            )}
           </>
         )}
       </CardContent>

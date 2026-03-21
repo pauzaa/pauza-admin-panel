@@ -13,6 +13,7 @@ import type { TooltipProps } from 'recharts';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useTheme } from '@/hooks/useTheme';
 import { TIME_RANGES, TIME_RANGE_SHORT_LABELS } from '@/lib/constants';
 import type { TimeRange } from '@/lib/constants';
 import { formatChartDate } from '@/lib/format';
@@ -80,6 +81,7 @@ export function TimeSeriesChart({
   isLoading,
   color,
 }: TimeSeriesChartProps) {
+  const { theme } = useTheme();
   const chartColor = color ?? getCSSColor('--color-primary', '#800020');
   const axisColor = getCSSColor('--color-on-surface-variant', '#6d6470');
   const gridColor = getCSSColor('--color-outline-variant', '#d9d3d8');
@@ -115,7 +117,7 @@ export function TimeSeriesChart({
             <p className="text-sm text-on-surface-variant">No data available</p>
           </div>
         ) : (
-          <ResponsiveContainer width="100%" height={280}>
+          <ResponsiveContainer key={theme} width="100%" height={280}>
             <AreaChart data={[...data]}>
               <defs>
                 <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">

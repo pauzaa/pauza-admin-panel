@@ -56,13 +56,13 @@ export async function apiFetch<T>(
     try {
       body = (await response.json()) as ApiErrorBody;
     } catch {
-      throw new ApiError('UNKNOWN_ERROR', response.statusText);
+      // JSON parse failed — fall through
     }
 
     throw new ApiError(
-      body.error.code,
-      body.error.message,
-      body.error.details?.fields,
+      body?.error?.code ?? 'UNKNOWN_ERROR',
+      body?.error?.message ?? response.statusText,
+      body?.error?.details?.fields,
     );
   }
 

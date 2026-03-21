@@ -1367,7 +1367,7 @@ export function listEntitlements(params: {
 
 export function manageEntitlement(
   userId: string,
-  params: { action: 'grant' | 'revoke'; entitlement: string; expires_at?: string },
+  params: { action: 'grant' | 'revoke'; entitlement: string; expires_at?: number },
 ) {
   return apiFetch<{ message: string }>(
     `/api/v1/admin/users/${encodeURIComponent(userId)}/entitlements`,
@@ -1544,7 +1544,7 @@ export interface UserListItem {
   username: string;
   profile_picture_url: string | null;
   premium_entitlement_active: boolean;
-  created_at: string; // RFC 3339
+  created_at: number; // Unix ms
 }
 
 export interface ListUsersResponse {
@@ -1559,13 +1559,13 @@ export interface UserDetail {
   username: string;
   profile_picture_url: string | null;
   leaderboard_visible: boolean;
-  created_at: string; // RFC 3339
+  created_at: number; // Unix ms
   is_premium: boolean;
-  current_period_end: string | null; // RFC 3339
+  current_period_end: number | null; // Unix ms
   revenuecat_app_user_id: string | null;
   friend_count: number;
   total_sessions: number;
-  last_session_time: number | null; // epoch ms
+  last_session_time: number | null; // Unix ms
 }
 ```
 
@@ -1580,8 +1580,8 @@ export interface EntitlementListItem {
   username: string;
   entitlement: string;
   is_active: boolean;
-  current_period_end: string | null; // RFC 3339
-  updated_at: string; // RFC 3339
+  current_period_end: number | null; // Unix ms
+  updated_at: number; // Unix ms
 }
 
 export interface ListEntitlementsResponse {
@@ -1592,7 +1592,7 @@ export interface ListEntitlementsResponse {
 export interface ManageEntitlementRequest {
   action: 'grant' | 'revoke';
   entitlement: 'premium';
-  expires_at?: string; // RFC 3339, must be in the future
+  expires_at?: number; // Unix ms, must be in the future
 }
 
 export interface ManageEntitlementResponse {
@@ -1647,9 +1647,9 @@ export interface RCSubscriberEntitlement {
   entitlement_id: string;
   is_active: boolean;
   product_identifier: string;
-  purchase_date: string; // RFC 3339 — always present (EntitlementObj.PurchaseDate is non-pointer in RC models)
-  expires_date: string | null;  // RFC 3339 — null for lifetime entitlements
-  grace_period_expires_date: string | null; // RFC 3339
+  purchase_date: number; // Unix ms — always present
+  expires_date: number | null;  // Unix ms — null for lifetime entitlements
+  grace_period_expires_date: number | null; // Unix ms
 }
 
 export interface RCSubscriberDetail {
@@ -1683,27 +1683,26 @@ export function formatDuration(ms: number): string {
   return `${hours}h ${minutes}m`;
 }
 
-export function formatDate(iso: string): string {
+export function formatDate(ms: number): string {
   return new Intl.DateTimeFormat('en-US', {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
-  }).format(new Date(iso));
+  }).format(new Date(ms));
 }
 
-export function formatRelativeTime(isoOrEpochMs: string | number): string {
-  const date = typeof isoOrEpochMs === 'number'
-    ? new Date(isoOrEpochMs)
-    : new Date(isoOrEpochMs);
-  const diffMs = Date.now() - date.getTime();
-  const minutes = Math.floor(diffMs / 60_000);
-  if (minutes < 1) return 'just now';
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 30) return `${days}d ago`;
-  return formatDate(date.toISOString());
+export function formatRelativeTime(ms: number): string {
+  const diffMs = Date.now() - ms;
+  const diffSeconds = Math.floor(diffMs / 1_000);
+  const diffMinutes = Math.floor(diffMs / 60_000);
+  const diffHours = Math.floor(diffMs / 3_600_000);
+  const diffDays = Math.floor(diffMs / 86_400_000);
+
+  if (diffSeconds < 60) return 'just now';
+  if (diffMinutes < 60) return `${diffMinutes}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays < 30) return `${diffDays}d ago`;
+  return formatDate(ms);
 }
 ```
 

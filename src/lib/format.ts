@@ -18,9 +18,11 @@ export function formatCurrency(cents: number): string {
 }
 
 export function formatDuration(ms: number): string {
-  const totalMinutes = Math.floor(ms / 60_000);
+  const totalMinutes = Math.round(ms / 60_000);
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
+  if (hours === 0) return `${String(minutes)}m`;
+  if (minutes === 0) return `${String(hours)}h`;
   return `${String(hours)}h ${String(minutes)}m`;
 }
 
