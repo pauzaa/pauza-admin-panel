@@ -25,7 +25,7 @@ export interface Column<T> {
 
 interface DataTableProps<T> {
   columns: Column<T>[];
-  data: T[];
+  data: readonly T[];
   keyExtractor: (row: T) => string | number;
   pagination: { page: number; limit: number; total: number };
   onPageChange: (page: number) => void;
