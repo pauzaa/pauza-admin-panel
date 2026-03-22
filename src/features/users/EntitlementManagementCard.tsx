@@ -51,7 +51,7 @@ export function EntitlementManagementCard({ user }: EntitlementManagementCardPro
     },
   });
 
-  const expiresAtMs = expiresAt ? new Date(expiresAt).getTime() : undefined;
+  const expiresAtMs = expiresAt ? new Date(expiresAt + 'T00:00:00').getTime() : undefined;
   const isExpiresAtInPast = expiresAtMs !== undefined && expiresAtMs <= Date.now();
   const canGrant = !user.is_premium && !!expiresAtMs && !isExpiresAtInPast;
 
@@ -117,7 +117,7 @@ export function EntitlementManagementCard({ user }: EntitlementManagementCardPro
           </label>
           <Input
             id="expires-at"
-            type="datetime-local"
+            type="date"
             value={expiresAt}
             onChange={(e) => { setExpiresAt(e.target.value); }}
             className="max-w-xs"
