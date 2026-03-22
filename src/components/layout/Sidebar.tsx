@@ -43,16 +43,16 @@ export function Sidebar({ isMobile, isOpen, onClose }: SidebarProps) {
       ref={sidebarRef}
       tabIndex={-1}
       className={cn(
-        'flex h-full w-60 shrink-0 flex-col border-r border-outline-variant bg-surface-container-low outline-none',
+        'flex h-full w-64 shrink-0 flex-col border-r border-outline-variant bg-surface-container-low outline-none',
         isMobile && 'shadow-xl',
       )}
     >
-      <div className="flex h-14 items-center justify-between px-5">
+      <div className="flex h-16 items-center justify-between border-b border-outline-variant px-5">
         <PauzaLogo />
         {isMobile && (
           <button
             onClick={onClose}
-            className="flex size-8 items-center justify-center rounded-lg text-on-surface-variant transition-colors hover:bg-surface-container hover:text-on-surface"
+            className="flex size-8 items-center justify-center rounded-lg text-on-surface-variant transition-colors duration-200 hover:bg-surface-container hover:text-on-surface"
             aria-label="Close sidebar"
           >
             <X className="size-4" />
@@ -60,7 +60,7 @@ export function Sidebar({ isMobile, isOpen, onClose }: SidebarProps) {
         )}
       </div>
 
-      <nav className="flex flex-1 flex-col gap-1 px-3 pt-3">
+      <nav className="flex flex-1 flex-col gap-1 px-3 py-4">
         {NAV_ITEMS.map(({ to, label, icon: Icon, end }) => (
           <NavLink
             key={to}
@@ -68,15 +68,27 @@ export function Sidebar({ isMobile, isOpen, onClose }: SidebarProps) {
             end={end}
             className={({ isActive }) =>
               cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                'group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-200',
                 isActive
                   ? 'bg-primary/10 text-primary'
                   : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface',
               )
             }
           >
-            <Icon className="size-4 shrink-0" />
-            {label}
+            {({ isActive }) => (
+              <>
+                <span
+                  className={cn(
+                    'absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full transition-colors duration-200',
+                    isActive
+                      ? 'bg-primary opacity-100'
+                      : 'bg-transparent opacity-0',
+                  )}
+                />
+                <Icon className="size-[18px] shrink-0" />
+                <span>{label}</span>
+              </>
+            )}
           </NavLink>
         ))}
       </nav>
@@ -84,9 +96,9 @@ export function Sidebar({ isMobile, isOpen, onClose }: SidebarProps) {
       <div className="border-t border-outline-variant p-3">
         <button
           onClick={logout}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-on-surface-variant transition-colors hover:bg-error/10 hover:text-error"
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-on-surface-variant transition-colors duration-200 hover:bg-error/10 hover:text-error"
         >
-          <LogOut className="size-4 shrink-0" />
+          <LogOut className="size-[18px] shrink-0" />
           Logout
         </button>
       </div>
@@ -101,7 +113,7 @@ export function Sidebar({ isMobile, isOpen, onClose }: SidebarProps) {
     <>
       <div
         className={cn(
-          'fixed inset-0 z-40 bg-black/50 transition-opacity duration-300',
+          'fixed inset-0 z-40 bg-on-surface/40 backdrop-blur-sm transition-opacity duration-300',
           isOpen ? 'opacity-100' : 'pointer-events-none opacity-0',
         )}
         onClick={onClose}

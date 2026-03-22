@@ -22,44 +22,59 @@ export function PaginationControls({
   const isFirstPage = page === 1;
   const isLastPage = page * limit >= total;
 
+  if (total === 0) {
+    return (
+      <div className="flex items-center justify-center py-1">
+        <span className="text-sm text-on-surface-variant">No results</span>
+      </div>
+    );
+  }
+
   return (
-    <div
-      className={cn(
-        'flex flex-col items-center gap-2 pt-4',
-        'sm:flex-row sm:justify-between sm:gap-0',
-      )}
-    >
-      <span
-        className={cn(
-          'text-sm text-on-surface-variant',
-          total > 0 && 'hidden sm:inline',
-        )}
-      >
-        {total === 0
-          ? 'No results'
-          : `Showing ${String(rangeStart)}–${String(rangeEnd)} of ${String(total)}`}
+    <div className="flex items-center justify-between">
+      <span className="text-sm tabular-nums text-on-surface-variant">
+        Showing{' '}
+        <span className="font-medium text-on-surface">
+          {String(rangeStart)}&ndash;{String(rangeEnd)}
+        </span>{' '}
+        of{' '}
+        <span className="font-medium text-on-surface">{String(total)}</span>
       </span>
 
       {totalPages > 1 && (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <Button
             variant="outline"
             size="icon-sm"
             disabled={isFirstPage}
-            onClick={() => { onPageChange(page - 1); }}
+            onClick={() => {
+              onPageChange(page - 1);
+            }}
             aria-label="Previous page"
+            className={cn(
+              'border-outline-variant/60 transition-colors duration-150',
+              isFirstPage && 'opacity-40',
+            )}
           >
             <ChevronLeft className="size-4" />
           </Button>
-          <span className="text-sm text-on-surface-variant">
-            Page {page} of {totalPages}
+          <span className="min-w-[5.5rem] text-center text-sm tabular-nums text-on-surface-variant">
+            Page{' '}
+            <span className="font-medium text-on-surface">{page}</span> of{' '}
+            <span className="font-medium text-on-surface">{totalPages}</span>
           </span>
           <Button
             variant="outline"
             size="icon-sm"
             disabled={isLastPage}
-            onClick={() => { onPageChange(page + 1); }}
+            onClick={() => {
+              onPageChange(page + 1);
+            }}
             aria-label="Next page"
+            className={cn(
+              'border-outline-variant/60 transition-colors duration-150',
+              isLastPage && 'opacity-40',
+            )}
           >
             <ChevronRight className="size-4" />
           </Button>

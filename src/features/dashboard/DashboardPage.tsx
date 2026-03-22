@@ -9,6 +9,7 @@ import {
   Flame,
   Gift,
   Heart,
+  LayoutDashboard,
   TrendingUp,
   Users,
 } from 'lucide-react';
@@ -16,14 +17,18 @@ import {
 import { getPlatformStats, getUserGrowth, getActiveUsers } from '@/api/endpoints/stats';
 import { getRCOverview, getRCChart } from '@/api/endpoints/revenuecat';
 import { ErrorAlert } from '@/components/shared/ErrorAlert';
+import { PageHeader } from '@/components/shared/PageHeader';
+import { SectionHeader } from '@/components/shared/SectionHeader';
 import { StatsCard } from '@/components/shared/StatsCard';
 import { TimeSeriesChart } from '@/components/shared/TimeSeriesChart';
-import type { TimeRange } from '@/lib/constants';
+import type { Granularity, TimeRange } from '@/lib/constants';
 import { formatCurrency, formatNumber } from '@/lib/format';
 
 export function DashboardPage() {
   const [userGrowthRange, setUserGrowthRange] = useState<TimeRange>('30d');
+  const [userGrowthGranularity, setUserGrowthGranularity] = useState<Granularity | undefined>();
   const [activeUsersRange, setActiveUsersRange] = useState<TimeRange>('30d');
+  const [activeUsersGranularity, setActiveUsersGranularity] = useState<Granularity | undefined>();
   const [revenueRange, setRevenueRange] = useState<TimeRange>('30d');
 
   const statsQuery = useQuery({
@@ -39,14 +44,14 @@ export function DashboardPage() {
   });
 
   const userGrowthQuery = useQuery({
-    queryKey: ['user-growth', userGrowthRange],
-    queryFn: () => getUserGrowth(userGrowthRange),
+    queryKey: ['user-growth', userGrowthRange, userGrowthGranularity],
+    queryFn: () => getUserGrowth(userGrowthRange, userGrowthGranularity),
     staleTime: 120_000,
   });
 
   const activeUsersQuery = useQuery({
-    queryKey: ['active-users', activeUsersRange],
-    queryFn: () => getActiveUsers(activeUsersRange),
+    queryKey: ['active-users', activeUsersRange, activeUsersGranularity],
+    queryFn: () => getActiveUsers(activeUsersRange, activeUsersGranularity),
     staleTime: 120_000,
   });
 
@@ -57,11 +62,15 @@ export function DashboardPage() {
   });
 
   return (
-    <div className="space-y-5 sm:space-y-6 lg:space-y-8">
-      <section className="space-y-3 sm:space-y-4">
-        <h2 className="text-base font-semibold text-on-surface sm:text-lg">
-          Platform Overview
-        </h2>
+    <div className="space-y-8">
+      <PageHeader
+        icon={LayoutDashboard}
+        title="Dashboard"
+        description="Platform metrics and performance at a glance."
+      />
+
+      <section className="space-y-4">
+        <SectionHeader icon={Users} title="Platform Overview" />
 
         {statsQuery.error && (
           <ErrorAlert
@@ -70,7 +79,7 @@ export function DashboardPage() {
           />
         )}
 
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-6">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
           <StatsCard
             label="Total Users"
             value={statsQuery.data?.total_users ?? 0}
@@ -113,10 +122,10 @@ export function DashboardPage() {
         </div>
       </section>
 
-      <section className="space-y-3 sm:space-y-4">
-        <h2 className="text-base font-semibold text-on-surface sm:text-lg">
-          Revenue Overview
-        </h2>
+      <div className="border-t border-outline-variant/50" />
+
+      <section className="space-y-4">
+        <SectionHeader icon={DollarSign} title="Revenue Overview" />
 
         {rcOverviewQuery.error && (
           <ErrorAlert
@@ -125,7 +134,7 @@ export function DashboardPage() {
           />
         )}
 
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <StatsCard
             label="MRR"
             value={rcOverviewQuery.data?.mrr ?? 0}
@@ -155,15 +164,19 @@ export function DashboardPage() {
         </div>
       </section>
 
-      <section className="space-y-3 sm:space-y-4">
-        <h2 className="text-base font-semibold text-on-surface sm:text-lg">Trends</h2>
+      <div className="border-t border-outline-variant/50" />
 
-        <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-2">
+      <section className="space-y-4">
+        <SectionHeader icon={TrendingUp} title="Trends" />
+
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <TimeSeriesChart
             title="User Growth"
             data={userGrowthQuery.data?.data ?? []}
             range={userGrowthRange}
             onRangeChange={setUserGrowthRange}
+            granularity={userGrowthGranularity}
+            onGranularityChange={setUserGrowthGranularity}
             yAxisFormatter={formatNumber}
             tooltipFormatter={formatNumber}
             isLoading={userGrowthQuery.isLoading}
@@ -173,6 +186,8 @@ export function DashboardPage() {
             data={activeUsersQuery.data?.data ?? []}
             range={activeUsersRange}
             onRangeChange={setActiveUsersRange}
+            granularity={activeUsersGranularity}
+            onGranularityChange={setActiveUsersGranularity}
             yAxisFormatter={formatNumber}
             tooltipFormatter={formatNumber}
             isLoading={activeUsersQuery.isLoading}

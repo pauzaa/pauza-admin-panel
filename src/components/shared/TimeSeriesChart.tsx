@@ -11,12 +11,13 @@ import {
 
 import type { TooltipProps } from 'recharts';
 
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { BarChart3 } from 'lucide-react';
+
 import { Skeleton } from '@/components/ui/skeleton';
+import { SegmentedControl } from '@/components/shared/SegmentedControl';
 import { useTheme } from '@/hooks/useTheme';
-import { TIME_RANGES, TIME_RANGE_SHORT_LABELS } from '@/lib/constants';
-import type { TimeRange } from '@/lib/constants';
+import { GRANULARITIES, GRANULARITY_LABELS, TIME_RANGES, TIME_RANGE_SHORT_LABELS } from '@/lib/constants';
+import type { Granularity, TimeRange } from '@/lib/constants';
 import { formatChartDate } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
@@ -72,6 +73,8 @@ interface TimeSeriesChartProps {
   tooltipFormatter?: (value: number) => string;
   isLoading?: boolean;
   color?: string;
+  granularity?: Granularity;
+  onGranularityChange?: (granularity: Granularity) => void;
 }
 
 function getCSSColor(varName: string, fallback: string): string {
@@ -117,9 +120,9 @@ function ChartTooltipContent({
   const formattedValue = tooltipFormatter ? tooltipFormatter(value) : String(value);
 
   return (
-    <div className="rounded-lg border border-outline-variant bg-surface-container-highest p-3 shadow-lg">
-      <p className="text-xs text-on-surface-variant">{formattedDate}</p>
-      <p className="text-sm font-semibold text-on-surface">{formattedValue}</p>
+    <div className="rounded-lg border border-outline-variant bg-surface-container-highest px-3.5 py-2.5 shadow-lg">
+      <p className="text-[0.6875rem] font-medium text-on-surface-variant">{formattedDate}</p>
+      <p className="mt-0.5 text-sm font-semibold tabular-nums text-on-surface">{formattedValue}</p>
     </div>
   );
 }
@@ -133,6 +136,8 @@ export function TimeSeriesChart({
   tooltipFormatter,
   isLoading,
   color,
+  granularity,
+  onGranularityChange,
 }: TimeSeriesChartProps) {
   const { theme } = useTheme();
   const { ref: containerRef, width: containerWidth } = useContainerWidth();
@@ -147,32 +152,36 @@ export function TimeSeriesChart({
   const cursorStyle = useMemo(() => ({ stroke: gridColor, strokeDasharray: '3 3' }), [gridColor]);
 
   return (
-    <Card ref={containerRef} className="border border-outline-variant bg-surface-container">
-      <div className="flex flex-wrap items-center justify-between gap-2 px-4 pb-2 pt-4 sm:px-6 sm:pt-5">
+    <div ref={containerRef} className="overflow-hidden rounded-xl border border-outline-variant bg-surface">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-5 pb-3 pt-5">
         <h3 className="text-sm font-semibold text-on-surface sm:text-base">{title}</h3>
-        <div className="flex flex-wrap items-center gap-1">
-          {TIME_RANGES.map((r) => (
-            <Button
-              key={r}
-              size="xs"
-              variant={r === range ? 'default' : 'ghost'}
-              className={cn(
-                'rounded-md',
-                r === range && 'bg-primary text-on-primary',
-              )}
-              onClick={() => { onRangeChange(r); }}
-            >
-              {TIME_RANGE_SHORT_LABELS[r]}
-            </Button>
-          ))}
+
+        <div className="flex flex-wrap items-center gap-2">
+          {onGranularityChange && granularity && (
+            <>
+              <SegmentedControl
+                options={GRANULARITIES.map((g) => ({ label: GRANULARITY_LABELS[g], value: g }))}
+                value={granularity}
+                onChange={onGranularityChange}
+              />
+              <span className="mx-0.5 h-5 w-px bg-outline-variant" />
+            </>
+          )}
+
+          <SegmentedControl
+            options={TIME_RANGES.map((r) => ({ label: TIME_RANGE_SHORT_LABELS[r], value: r }))}
+            value={range}
+            onChange={onRangeChange}
+          />
         </div>
       </div>
 
-      <div className="px-1 pb-3 sm:px-2 sm:pb-4">
+      <div className="px-2 pb-4">
         {isLoading ? (
-          <Skeleton className={cn('mx-4 rounded-lg', heightClass)} />
+          <Skeleton className={cn('mx-3 rounded-lg', heightClass)} />
         ) : data.length === 0 ? (
-          <div className={cn('flex items-center justify-center', heightClass)}>
+          <div className={cn('flex flex-col items-center justify-center gap-2', heightClass)}>
+            <BarChart3 className="size-8 text-on-surface-variant/40" />
             <p className="text-sm text-on-surface-variant">No data available</p>
           </div>
         ) : (
@@ -225,6 +234,6 @@ export function TimeSeriesChart({
           </ResponsiveContainer>
         )}
       </div>
-    </Card>
+    </div>
   );
 }

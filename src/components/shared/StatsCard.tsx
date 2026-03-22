@@ -40,19 +40,23 @@ export function StatsCard({
   isLoading,
 }: StatsCardProps) {
   return (
-    <Card className="bg-surface-container">
-      <CardContent className="flex flex-col gap-1.5 p-3 lg:gap-2 lg:p-4">
-        <div className="flex items-center gap-1.5 lg:gap-2">
-          <Icon className="size-4 text-on-surface-variant lg:size-5" />
-          <span className="text-xs text-on-surface-variant lg:text-sm">{label}</span>
+    <Card className="border-outline-variant/50 bg-surface-container">
+      <CardContent className="flex items-start gap-4 p-4 lg:p-5">
+        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 lg:size-11">
+          <Icon className="size-5 text-primary" />
         </div>
-        {isLoading ? (
-          <Skeleton className="h-7 w-20 lg:h-8 lg:w-24" />
-        ) : (
-          <span className="text-xl font-bold text-on-surface lg:text-2xl">
-            {formatValue(value, formatAs, suffix)}
+        <div className="flex flex-col gap-1">
+          <span className="text-xs font-medium text-on-surface-variant lg:text-sm">
+            {label}
           </span>
-        )}
+          {isLoading ? (
+            <Skeleton className="h-7 w-20 lg:h-8 lg:w-24" />
+          ) : (
+            <span className="text-xl font-bold tracking-tight text-on-surface lg:text-2xl">
+              {formatValue(value, formatAs, suffix)}
+            </span>
+          )}
+        </div>
       </CardContent>
     </Card>
   );

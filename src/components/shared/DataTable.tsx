@@ -55,20 +55,28 @@ export function DataTable<T>({
   const showToolbar = onSearchChange || onExportCSV;
 
   return (
-    <div>
+    <div className="overflow-hidden rounded-xl border border-outline-variant bg-surface">
       {showToolbar && (
-        <div className={cn(
-          'flex flex-col gap-3 pb-4 sm:flex-row sm:items-center sm:gap-4',
-          onSearchChange && onExportCSV ? 'sm:justify-between' : 'sm:justify-end',
-        )}>
+        <div
+          className={cn(
+            'flex items-center gap-3 border-b border-outline-variant/50 px-5 py-3.5',
+            onSearchChange && onExportCSV
+              ? 'justify-between'
+              : onSearchChange
+                ? 'justify-start'
+                : 'justify-end',
+          )}
+        >
           {onSearchChange && (
-            <div className="relative w-full sm:w-64">
-              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-on-surface-variant" />
+            <div className="relative w-72">
+              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-on-surface-variant/70" />
               <Input
                 value={searchValue ?? ''}
-                onChange={(e) => { onSearchChange(e.target.value); }}
+                onChange={(e) => {
+                  onSearchChange(e.target.value);
+                }}
                 placeholder={searchPlaceholder}
-                className="w-full pl-9"
+                className="h-9 w-full rounded-lg border-outline-variant/60 bg-surface-container-low pl-9 text-sm placeholder:text-on-surface-variant/50 focus:border-primary/40 focus:ring-primary/15"
               />
             </div>
           )}
@@ -79,11 +87,12 @@ export function DataTable<T>({
               size="sm"
               onClick={onExportCSV}
               disabled={isExporting}
+              className="gap-2 border-outline-variant/60 text-on-surface-variant transition-colors duration-150 hover:text-on-surface"
             >
               {isExporting ? (
                 <LoadingSpinner size="sm" />
               ) : (
-                <Download className="size-4" />
+                <Download className="size-3.5" />
               )}
               Export CSV
             </Button>
@@ -91,21 +100,21 @@ export function DataTable<T>({
         </div>
       )}
 
-      <div className="relative overflow-x-auto rounded-lg border border-outline-variant">
+      <div className="relative overflow-x-auto">
         {isLoading && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-surface/60">
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-surface/70 backdrop-blur-sm transition-opacity duration-200">
             <LoadingSpinner size="lg" />
           </div>
         )}
 
         <Table>
           <TableHeader>
-            <TableRow className="bg-surface-container hover:bg-surface-container">
+            <TableRow className="border-b border-outline-variant/50 bg-surface-container-high hover:bg-surface-container-high">
               {columns.map((column) => (
                 <TableHead
                   key={column.key}
                   style={column.width ? { width: column.width } : undefined}
-                  className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant"
+                  className="h-10 px-5 text-[0.6875rem] font-semibold uppercase tracking-widest text-on-surface-variant"
                 >
                   {column.header}
                 </TableHead>
@@ -113,44 +122,62 @@ export function DataTable<T>({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.length === 0 && !isLoading ? (
-              <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={columns.length}>
-                  <EmptyState
-                    icon={Search}
-                    title="No results found"
-                    description="Try adjusting your search or filters"
-                  />
-                </TableCell>
-              </TableRow>
-            ) : (
-              data.map((row) => (
+            {(() => {
+              if (data.length === 0 && !isLoading) {
+                return (
+                  <TableRow className="hover:bg-transparent">
+                    <TableCell colSpan={columns.length} className="py-6">
+                      <EmptyState
+                        icon={Search}
+                        title="No results found"
+                        description="Try adjusting your search or filters"
+                      />
+                    </TableCell>
+                  </TableRow>
+                );
+              }
+              const rowClassName = cn(
+                'border-b border-outline-variant/30 transition-colors duration-150 last:border-b-0',
+                onRowClick && 'cursor-pointer hover:bg-surface-container-low',
+              );
+              return data.map((row) => (
                 <TableRow
                   key={keyExtractor(row)}
-                  onClick={onRowClick ? () => { onRowClick(row); } : undefined}
-                  className={cn(onRowClick && 'cursor-pointer')}
+                  onClick={
+                    onRowClick
+                      ? () => {
+                          onRowClick(row);
+                        }
+                      : undefined
+                  }
+                  className={rowClassName}
                 >
                   {columns.map((column) => (
                     <TableCell
                       key={column.key}
-                      style={column.width ? { width: column.width } : undefined}
+                      style={
+                        column.width ? { width: column.width } : undefined
+                      }
+                      className="px-5"
                     >
                       {column.render(row)}
                     </TableCell>
                   ))}
                 </TableRow>
-              ))
-            )}
+              ));
+            })()}
           </TableBody>
         </Table>
       </div>
 
-      <PaginationControls
-        page={pagination.page}
-        limit={pagination.limit}
-        total={pagination.total}
-        onPageChange={onPageChange}
-      />
+      <div className="border-t border-outline-variant/50 px-5 py-3">
+        <PaginationControls
+          page={pagination.page}
+          limit={pagination.limit}
+          total={pagination.total}
+          onPageChange={onPageChange}
+        />
+      </div>
     </div>
   );
 }

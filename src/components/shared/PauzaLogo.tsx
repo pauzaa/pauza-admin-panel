@@ -6,17 +6,17 @@ interface PauzaLogoProps {
 
 export function PauzaLogo({ size = 'sm' }: PauzaLogoProps) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2.5">
       <div
         className={cn(
-          'flex items-center justify-center bg-primary',
-          size === 'sm' ? 'size-7 rounded-md' : 'size-10 rounded-lg',
+          'flex items-center justify-center rounded-lg bg-primary shadow-sm',
+          size === 'sm' ? 'size-8' : 'size-10',
         )}
       >
         <span
           className={cn(
             'font-bold tracking-tight text-on-primary',
-            size === 'sm' ? 'text-xs' : 'text-base',
+            size === 'sm' ? 'text-sm' : 'text-base',
           )}
         >
           P
@@ -33,11 +33,11 @@ export function PauzaLogo({ size = 'sm' }: PauzaLogoProps) {
         </span>
         <span
           className={cn(
-            'text-on-surface-variant',
+            'font-medium text-on-surface-variant',
             size === 'sm' ? 'text-[10px] leading-none' : 'text-xs',
           )}
         >
-          Admin Panel
+          Admin
         </span>
       </div>
     </div>

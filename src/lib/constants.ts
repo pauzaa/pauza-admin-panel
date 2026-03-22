@@ -12,3 +12,12 @@ export const TIME_RANGE_SHORT_LABELS: Record<TimeRange, string> = {
   '1y': '1y',
   all: 'All',
 };
+
+export const GRANULARITIES = ['day', 'week', 'month'] as const;
+export type Granularity = (typeof GRANULARITIES)[number];
+
+export const GRANULARITY_LABELS: Record<Granularity, string> = {
+  day: 'Day',
+  week: 'Week',
+  month: 'Month',
+};

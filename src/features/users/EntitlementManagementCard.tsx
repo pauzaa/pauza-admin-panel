@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Crown, User, ShieldCheck, ShieldX, CalendarClock } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { manageEntitlement } from '@/api/endpoints/entitlements';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -15,9 +16,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { StatusBadge } from '@/components/shared/StatusBadge';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
 import { formatDate } from '@/lib/format';
+import { cn } from '@/lib/utils';
 import type { UserDetail } from '@/types/user';
 import type { ManageEntitlementRequest } from '@/types/entitlement';
 
@@ -50,12 +51,16 @@ export function EntitlementManagementCard({ user }: EntitlementManagementCardPro
     },
   });
 
+  const expiresAtMs = expiresAt ? new Date(expiresAt).getTime() : undefined;
+  const isExpiresAtInPast = expiresAtMs !== undefined && expiresAtMs <= Date.now();
+  const canGrant = !user.is_premium && !!expiresAtMs && !isExpiresAtInPast;
+
   function handleGrant() {
-    const expiresAtMs = expiresAt ? new Date(expiresAt).getTime() : undefined;
+    if (!expiresAtMs) return;
     mutation.mutate({
       action: 'grant',
       entitlement: 'premium',
-      ...(expiresAtMs ? { expires_at: expiresAtMs } : {}),
+      expires_at: expiresAtMs,
     });
   }
 
@@ -63,32 +68,52 @@ export function EntitlementManagementCard({ user }: EntitlementManagementCardPro
     mutation.mutate({ action: 'revoke', entitlement: 'premium' });
   }
 
-  const expiresAtFormatted = expiresAt
-    ? formatDate(new Date(expiresAt).getTime())
-    : null;
+  const expiresAtFormatted = expiresAtMs ? formatDate(expiresAtMs) : null;
 
   return (
-    <Card className="bg-surface-container">
-      <CardHeader>
-        <CardTitle>Entitlement Management</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex items-center gap-2 text-sm text-on-surface">
-          <span>Current:</span>
-          <StatusBadge active={user.is_premium} />
-          {user.is_premium && user.current_period_end && (
-            <span className="text-on-surface-variant">
-              (expires {formatDate(user.current_period_end)})
-            </span>
+    <Card className="border-outline-variant/50 bg-surface-container">
+      <CardContent className="p-5 sm:p-6">
+        <div
+          className={cn(
+            'flex items-center gap-3.5 rounded-xl p-4',
+            user.is_premium
+              ? 'bg-success/8 ring-1 ring-inset ring-success/20'
+              : 'bg-surface-container-high',
           )}
+        >
+          <div
+            className={cn(
+              'flex size-10 shrink-0 items-center justify-center rounded-full',
+              user.is_premium
+                ? 'bg-success/15'
+                : 'bg-surface-container-highest',
+            )}
+          >
+            {user.is_premium ? (
+              <Crown className="size-5 text-success" />
+            ) : (
+              <User className="size-5 text-on-surface-variant" />
+            )}
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-on-surface">
+              {user.is_premium ? 'Premium Active' : 'Free User'}
+            </p>
+            {user.is_premium && user.current_period_end && (
+              <p className="mt-0.5 text-xs text-on-surface-variant">
+                Expires {formatDate(user.current_period_end)}
+              </p>
+            )}
+          </div>
         </div>
 
-        <div className="space-y-1.5">
+        <div className="mt-5 space-y-2">
           <label
             htmlFor="expires-at"
-            className="text-xs font-medium uppercase tracking-wider text-on-surface-variant"
+            className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-on-surface-variant"
           >
-            Expires At (optional)
+            <CalendarClock className="size-3.5" />
+            Expiration Date
           </label>
           <Input
             id="expires-at"
@@ -97,21 +122,29 @@ export function EntitlementManagementCard({ user }: EntitlementManagementCardPro
             onChange={(e) => { setExpiresAt(e.target.value); }}
             className="max-w-xs"
           />
+          {isExpiresAtInPast && (
+            <p className="text-xs font-medium text-error">
+              Expiry date must be in the future
+            </p>
+          )}
         </div>
 
-        <div className="flex gap-3">
+        <div className="mt-5 flex flex-wrap gap-3">
           <Button
-            className="bg-success text-on-success hover:bg-success/90"
-            disabled={user.is_premium || mutation.isPending}
+            className="bg-success text-on-success shadow-sm hover:bg-success/90"
+            disabled={!canGrant || mutation.isPending}
             onClick={() => { setShowGrantDialog(true); }}
           >
+            <ShieldCheck className="size-4" />
             Grant Premium
           </Button>
           <Button
             variant="destructive"
+            className="shadow-sm"
             disabled={!user.is_premium || mutation.isPending}
             onClick={() => { setShowRevokeDialog(true); }}
           >
+            <ShieldX className="size-4" />
             Revoke Premium
           </Button>
         </div>

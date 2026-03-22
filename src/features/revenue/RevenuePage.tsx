@@ -32,11 +32,11 @@ export function RevenuePage() {
   });
 
   return (
-    <div className="space-y-6 lg:space-y-8">
-      <h1 className="text-lg font-semibold text-on-surface">Revenue</h1>
-
-      <section className="space-y-3 lg:space-y-4">
-        <h2 className="text-lg font-semibold text-on-surface">Overview</h2>
+    <div className="space-y-5 sm:space-y-6 lg:space-y-8">
+      <section className="space-y-3 sm:space-y-4">
+        <h2 className="text-base font-semibold text-on-surface sm:text-lg">
+          Revenue Overview
+        </h2>
 
         {rcOverviewQuery.error && (
           <ErrorAlert
@@ -45,7 +45,7 @@ export function RevenuePage() {
           />
         )}
 
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           <StatsCard
             label="MRR"
             value={rcOverviewQuery.data?.mrr ?? 0}
@@ -75,8 +75,10 @@ export function RevenuePage() {
         </div>
       </section>
 
-      <section className="space-y-3 lg:space-y-4">
-        <h2 className="text-lg font-semibold text-on-surface">Trends</h2>
+      <section className="space-y-3 sm:space-y-4">
+        <h2 className="text-base font-semibold text-on-surface sm:text-lg">
+          Trends
+        </h2>
 
         {revenueChartQuery.error && (
           <ErrorAlert
@@ -92,7 +94,7 @@ export function RevenuePage() {
           />
         )}
 
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-2">
           <TimeSeriesChart
             title="Revenue Over Time"
             data={revenueChartQuery.data?.data ?? []}

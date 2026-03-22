@@ -1,17 +1,18 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Crown } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { listEntitlements } from '@/api/endpoints/entitlements';
 import { DataTable } from '@/components/shared/DataTable';
+import { PageHeader } from '@/components/shared/PageHeader';
+import { SegmentedControl } from '@/components/shared/SegmentedControl';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { ErrorAlert } from '@/components/shared/ErrorAlert';
 import { DEFAULT_PAGE, DEFAULT_LIMIT, EXPORT_LIMIT } from '@/lib/constants';
 import { formatDate, formatRelativeTime } from '@/lib/format';
 import { fetchAllPages, downloadCSV } from '@/lib/csv';
-import { cn } from '@/lib/utils';
 import type { Column } from '@/components/shared/DataTable';
 import type { EntitlementListItem } from '@/types/entitlement';
 
@@ -115,6 +116,8 @@ export function EntitlementsListPage() {
     placeholderData: keepPreviousData,
   });
 
+  const totalEntitlements = entitlementsQuery.data?.pagination.total ?? 0;
+
   function handleFilterChange(value: boolean | undefined) {
     setFilter(value);
     setPage(DEFAULT_PAGE);
@@ -146,25 +149,20 @@ export function EntitlementsListPage() {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      <h1 className="text-base font-semibold text-on-surface sm:text-lg">Entitlements</h1>
+    <div className="space-y-5 lg:space-y-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <PageHeader
+          icon={Crown}
+          title="Entitlements"
+          description="Track premium subscriptions and access rights"
+          count={totalEntitlements}
+        />
 
-      <div className="inline-flex rounded-lg border border-outline-variant">
-        {FILTER_OPTIONS.map((option) => (
-          <button
-            key={option.label}
-            type="button"
-            onClick={() => { handleFilterChange(option.value); }}
-            className={cn(
-              'px-3 py-1.5 text-sm transition-colors first:rounded-l-lg last:rounded-r-lg sm:px-4',
-              filter === option.value
-                ? 'bg-primary/10 font-medium text-primary'
-                : 'text-on-surface-variant hover:bg-surface-container',
-            )}
-          >
-            {option.label}
-          </button>
-        ))}
+        <SegmentedControl
+          options={FILTER_OPTIONS}
+          value={filter}
+          onChange={handleFilterChange}
+        />
       </div>
 
       {entitlementsQuery.error && (

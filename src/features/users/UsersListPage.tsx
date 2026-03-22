@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Users } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { listUsers } from '@/api/endpoints/users';
 import { DataTable } from '@/components/shared/DataTable';
+import { PageHeader } from '@/components/shared/PageHeader';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { ErrorAlert } from '@/components/shared/ErrorAlert';
 import { UserAvatar } from '@/components/shared/UserAvatar';
@@ -90,6 +91,8 @@ export function UsersListPage() {
     placeholderData: keepPreviousData,
   });
 
+  const totalUsers = usersQuery.data?.pagination.total ?? 0;
+
   function handleSearchChange(value: string) {
     setSearch(value);
     setPage(DEFAULT_PAGE);
@@ -115,8 +118,13 @@ export function UsersListPage() {
   }
 
   return (
-    <div className="space-y-4 lg:space-y-6">
-      <h1 className="text-base font-semibold text-on-surface lg:text-lg">Users</h1>
+    <div className="space-y-5 lg:space-y-6">
+      <PageHeader
+        icon={Users}
+        title="Users"
+        description="Manage and view all registered users"
+        count={totalUsers}
+      />
 
       {usersQuery.error && (
         <ErrorAlert

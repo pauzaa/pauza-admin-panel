@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import type { SyntheticEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { AlertCircle, Loader2, Lock } from 'lucide-react';
 
 import { ApiError } from '@/api/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
 import { PauzaLogo } from '@/components/shared/PauzaLogo';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
 import { useAuth } from '@/features/auth/useAuth';
+import { cn } from '@/lib/utils';
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof ApiError) {
@@ -55,77 +55,98 @@ export function LoginPage() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center bg-surface-dim p-4">
-      <div className="absolute right-4 top-4">
+      {/* Decorative background elements */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -right-32 -top-32 size-96 rounded-full bg-primary/5 blur-3xl" />
+        <div className="absolute -bottom-32 -left-32 size-96 rounded-full bg-primary/5 blur-3xl" />
+      </div>
+
+      {/* Theme toggle */}
+      <div className="absolute right-5 top-5">
         <ThemeToggle />
       </div>
 
-      <Card className="w-full max-w-[400px]">
-        <CardContent className="flex flex-col gap-6 pt-2">
-          <div className="flex justify-center pb-2">
-            <PauzaLogo size="md" />
+      {/* Login card */}
+      <div className="relative w-full max-w-sm rounded-2xl border border-outline-variant bg-surface p-8 shadow-lg">
+        {/* Branding */}
+        <div className="flex flex-col items-center gap-3 pb-8">
+          <PauzaLogo size="md" />
+          <p className="text-sm text-on-surface-variant">
+            Sign in to your account
+          </p>
+        </div>
+
+        {/* Error alert */}
+        {error !== null && (
+          <div className="mb-6 flex items-start gap-2.5 rounded-lg bg-error-container px-4 py-3 text-sm text-on-error-container">
+            <AlertCircle className="mt-0.5 size-4 shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          <div className="flex flex-col gap-2">
+            <label
+              htmlFor="username"
+              className="text-sm font-medium text-on-surface"
+            >
+              Username
+            </label>
+            <Input
+              id="username"
+              type="text"
+              placeholder="Enter your username"
+              autoFocus
+              autoComplete="username"
+              className="h-11"
+              value={username}
+              onChange={(e) => { setUsername(e.target.value); }}
+              disabled={isLoading}
+              required
+            />
           </div>
 
-          {/* Error */}
-          {error !== null && (
-            <div className="rounded-lg bg-error-container px-3 py-2.5 text-sm text-on-error-container">
-              {error}
-            </div>
-          )}
-
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor="username"
-                className="text-xs font-medium text-on-surface-variant"
-              >
-                Username
-              </label>
-              <Input
-                id="username"
-                type="text"
-                autoFocus
-                autoComplete="username"
-                value={username}
-                onChange={(e) => { setUsername(e.target.value); }}
-                disabled={isLoading}
-                required
-              />
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor="password"
-                className="text-xs font-medium text-on-surface-variant"
-              >
-                Password
-              </label>
-              <Input
-                id="password"
-                type="password"
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => { setPassword(e.target.value); }}
-                disabled={isLoading}
-                required
-              />
-            </div>
-
-            <Button
-              type="submit"
-              size="lg"
-              disabled={isLoading}
-              className="mt-1 w-full"
+          <div className="flex flex-col gap-2">
+            <label
+              htmlFor="password"
+              className="text-sm font-medium text-on-surface"
             >
-              {isLoading ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : (
-                'Sign in'
-              )}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+              Password
+            </label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="Enter your password"
+              autoComplete="current-password"
+              className="h-11"
+              value={password}
+              onChange={(e) => { setPassword(e.target.value); }}
+              disabled={isLoading}
+              required
+            />
+          </div>
+
+          <Button
+            type="submit"
+            size="lg"
+            disabled={isLoading}
+            className={cn(
+              'mt-2 h-11 w-full gap-2 transition-all duration-200',
+              isLoading && 'opacity-80',
+            )}
+          >
+            {isLoading ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <>
+                <Lock className="size-4" />
+                Sign in
+              </>
+            )}
+          </Button>
+        </form>
+      </div>
     </div>
   );
 }

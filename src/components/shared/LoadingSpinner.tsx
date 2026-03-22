@@ -15,7 +15,7 @@ interface LoadingSpinnerProps {
 export function LoadingSpinner({ size = 'md' }: LoadingSpinnerProps) {
   return (
     <Loader2
-      className={cn('animate-spin text-primary', sizeClasses[size])}
+      className={cn('animate-spin text-primary/70', sizeClasses[size])}
       aria-hidden="true"
     />
   );
